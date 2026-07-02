@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from rest_framework.validators import UniqueValidator
+from .models import Profile
 
 User = get_user_model()
 
@@ -39,3 +40,22 @@ class RegisterSerializer(serializers.ModelSerializer):
             password=validated_data['password_1'],
         )
         return user
+    
+
+class ProfileSerializer(serializers.ModelSerializer):
+    is_owner = serializers.SerializerMethodField()
+    username = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Profile
+        exclude = [
+            'updated_at', 'user'
+            ]
+        
+    def get_is_owner(self, obj):
+        request = self.context.get("request")
+        return obj.user == request.user
+    
+    def get_username(self, obj):
+        return obj.user.username
+    
