@@ -2,6 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from rest_framework.validators import UniqueValidator
 from .models import Profile
+from apps.follows.models import Follow
 
 User = get_user_model()
 
@@ -45,6 +46,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 class ProfileSerializer(serializers.ModelSerializer):
     is_owner = serializers.SerializerMethodField()
     username = serializers.SerializerMethodField()
+    is_following = serializers.SerializerMethodField()
 
     class Meta:
         model = Profile
@@ -58,4 +60,8 @@ class ProfileSerializer(serializers.ModelSerializer):
     
     def get_username(self, obj):
         return obj.user.username
+    
+    def get_is_following(self, obj):
+        request = self.context.get("request")
+        return Follow.objects.filter(follower=request.user, following=obj.user).exists()
     

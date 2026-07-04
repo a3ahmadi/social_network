@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     #apps
     'apps.accounts',
     'apps.posts',
+    'apps.follows',
 ]
 
 MIDDLEWARE = [
