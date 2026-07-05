@@ -16,6 +16,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from rest_framework.routers import DefaultRouter
+from apps.posts.views import PostViewset
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -33,15 +35,19 @@ from apps.follows.views import (
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    #accounts
+#accounts
     path('api/register/', RegisterView.as_view()),
     path('api/token/', TokenObtainPairView.as_view()),
     path('api/token/refresh/', TokenRefreshView.as_view()),
     path('api/profile/<str:username>/', ProfileView.as_view()),
-    #follows
+#follows
     path('api/follow/<str:username>/', FollowView.as_view()),
     path('api/follower/', FollowerListView.as_view()),
     path('api/following/', FollowingListView.as_view()),
-
-
+    
 ]
+
+#posts
+router = DefaultRouter()
+router.register(r'api/post', PostViewset, basename="post")
+urlpatterns += router.urls
