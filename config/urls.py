@@ -17,7 +17,6 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from rest_framework.routers import DefaultRouter
-from apps.posts.views import PostViewset
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -32,6 +31,10 @@ from apps.follows.views import (
     FollowerListView,
     FollowingListView
 )
+from apps.posts.views import (
+    PostViewset,
+    LikeView
+)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -44,7 +47,8 @@ urlpatterns = [
     path('api/follow/<str:username>/', FollowView.as_view()),
     path('api/follower/', FollowerListView.as_view()),
     path('api/following/', FollowingListView.as_view()),
-    
+#like
+    path('api/post/<int:post_id>/like/', LikeView.as_view()),
 ]
 
 #posts

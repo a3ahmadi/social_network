@@ -1,8 +1,8 @@
 from rest_framework import serializers
-from .models import Post
+from .models import Post, Like
 from apps.accounts.models import Profile
 
-class PostUserSerializer(serializers.ModelSerializer):
+class UserListSerializer(serializers.ModelSerializer):
     username = serializers.CharField(
         source="user.username"
     )
@@ -12,7 +12,7 @@ class PostUserSerializer(serializers.ModelSerializer):
 
 
 class PostSerializer(serializers.ModelSerializer):
-    user = PostUserSerializer(
+    user = UserListSerializer(
         source="user.profile",
         read_only=True
     )
@@ -20,3 +20,12 @@ class PostSerializer(serializers.ModelSerializer):
         model = Post
         fields = "__all__"
 
+
+class LikeListSerializer(serializers.ModelSerializer):
+    user = UserListSerializer(
+        source="user.profile",
+        read_only=True
+    )
+    class Meta:
+        model = Like
+        fields = ('user',)

@@ -38,3 +38,26 @@ class Post(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
+
+
+class Like(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name='likes',
+        on_delete=models.CASCADE
+    )
+    post = models.ForeignKey(
+        Post,
+        related_name='posts',
+        on_delete=models.CASCADE
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    def __str__(self):
+        return f'{self.user.username} _ {self.post.caption}'
+    
+    class Meta:
+        ordering = ('-created_at',)
+        unique_together = ('user', 'post')
