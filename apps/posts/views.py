@@ -1,10 +1,19 @@
 from rest_framework import viewsets
 from rest_framework.views import APIView
+from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
-from .models import Post
+from .models import Post, Comment
 from rest_framework import status
 from rest_framework.response import Response
-from .serializers import PostSerializer, LikeListSerializer
+from .permissions import IsCommentOwner
+from .serializers import (
+    PostSerializer,
+    LikeListSerializer,
+    CommentListSerializer,
+    CommentUpdateSerializer,
+    CommentDetailSerializer,
+    CommentCreateSerializer
+)
 from .services import(
     like_post,
     unlike_post,
@@ -35,4 +44,40 @@ class LikeView(APIView):
         result = unlike_post(request.user, post_id)
         return Response({'status': result}, status=status.HTTP_204_NO_CONTENT)
     
+
+class CommentListCreateView(generics.ListCreateAPIView):
+    serializer_class = CommentListSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Comment.objects.filter(
+        post_id=self.kwargs["post_id"],
+        parent=None
+    )
+
+    def perform_create(self, serializer):
+        serializer.save(
+            user=self.request.user,
+            post_id=self.kwargs["post_id"]
+        )
+
+    def get_serializer_class(self):
+        if self.request.method == "POST":
+            return CommentCreateSerializer
+
+        return CommentListSerializer
+
+
+class CommentDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Comment.objects.all()
+    permission_classes = [IsAuthenticated, IsCommentOwner]
+
+    def get_serializer_class(self):
+        if self.request.method in ["PUT", "PATCH"]:
+            return CommentUpdateSerializer
+
+        return CommentDetailSerializer
+
+
+
 

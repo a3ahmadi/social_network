@@ -33,7 +33,10 @@ from apps.follows.views import (
 )
 from apps.posts.views import (
     PostViewset,
-    LikeView
+    LikeView,
+    CommentListCreateView,
+    CommentDetailView
+
 )
 
 urlpatterns = [
@@ -47,8 +50,14 @@ urlpatterns = [
     path('api/follow/<str:username>/', FollowView.as_view()),
     path('api/follower/', FollowerListView.as_view()),
     path('api/following/', FollowingListView.as_view()),
-#like
+#likes
     path('api/post/<int:post_id>/like/', LikeView.as_view()),
+#comments
+    path('api/post/<int:post_id>/comment/', CommentListCreateView.as_view()),
+    path('api/comment/<int:pk>/',CommentDetailView.as_view())
+
+
+    
 ]
 
 #posts
