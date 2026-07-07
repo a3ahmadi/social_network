@@ -2,11 +2,11 @@ from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
-from .models import Post, Comment
+from .models import Post, Comment, SavedPost
 from apps.follows.models import Follow
 from rest_framework import status
 from rest_framework.response import Response
-from .permissions import IsCommentOwner
+from .permissions import IsOwner
 from django.db.models import Q
 from .serializers import (
     PostSerializer,
@@ -15,12 +15,13 @@ from .serializers import (
     CommentUpdateSerializer,
     CommentDetailSerializer,
     CommentCreateSerializer,
-    Feedserializer
 )
 from .services import(
     like_post,
     unlike_post,
-    post_likes_list
+    post_likes_list,
+    save_post,
+    delete_saved_post
 )
 
 
@@ -73,7 +74,7 @@ class CommentListCreateView(generics.ListCreateAPIView):
 
 class CommentDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Comment.objects.all()
-    permission_classes = [IsAuthenticated, IsCommentOwner]
+    permission_classes = [IsAuthenticated, IsOwner]
 
     def get_serializer_class(self):
         if self.request.method in ["PUT", "PATCH"]:
@@ -103,4 +104,25 @@ class FeedView(generics.ListAPIView):
         ).order_by(
             "-created_at"
         )
+    
 
+class SavePostView(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self, request, post_id):
+        result = save_post(post_id, request.user)
+        return Response({'status': result}, status=status.HTTP_201_CREATED)
+    
+    def delete(self, request, post_id):
+        result = delete_saved_post(post_id, request.user)
+        return Response({'status': result}, status=status.HTTP_204_NO_CONTENT)
+
+
+class SavePostListView(generics.ListAPIView):
+    serializer_class = PostSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Post.objects.filter(
+            saved_by__user=self.request.user
+        )
+    

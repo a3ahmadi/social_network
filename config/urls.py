@@ -36,7 +36,9 @@ from apps.posts.views import (
     LikeView,
     CommentListCreateView,
     CommentDetailView,
-    FeedView
+    FeedView,
+    SavePostView,
+    SavePostListView
 
 )
 
@@ -58,9 +60,11 @@ urlpatterns = [
     path('api/comment/<int:pk>/',CommentDetailView.as_view()),
 #feed
     path('api/feed/',FeedView.as_view()),
-    
+#save post
+    path('api/post/<int:post_id>/save/',SavePostView.as_view()),
+    path('api/post/saved/',SavePostListView.as_view()),
 
-    
+
 ]
 
 #posts

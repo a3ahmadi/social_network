@@ -97,3 +97,25 @@ class Comment(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
+
+
+class SavedPost(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name='saved_by',
+        on_delete=models.CASCADE
+    )
+    post = models.ForeignKey(
+        Post,
+        related_name='saved_by',
+        on_delete=models.CASCADE
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    def __str__(self):
+        return self.user.username
+
+    class Meta:
+        ordering = ["-created_at"]
