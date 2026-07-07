@@ -2,8 +2,10 @@ from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
+from django.contrib.auth import get_user_model
 from .models import Post, Comment, SavedPost
 from apps.follows.models import Follow
+from apps.accounts.models import Profile
 from rest_framework import status
 from rest_framework.response import Response
 from .permissions import IsOwner
@@ -15,6 +17,7 @@ from .serializers import (
     CommentUpdateSerializer,
     CommentDetailSerializer,
     CommentCreateSerializer,
+    UserListSerializer
 )
 from .services import(
     like_post,
@@ -23,6 +26,8 @@ from .services import(
     save_post,
     delete_saved_post
 )
+
+User = get_user_model()
 
 
 class PostViewset(viewsets.ModelViewSet):
@@ -126,3 +131,16 @@ class SavePostListView(generics.ListAPIView):
             saved_by__user=self.request.user
         )
     
+
+class UserSearchView(generics.ListAPIView):
+    serializer_class = UserListSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        query = self.request.query_params.get("q", "")
+        return Profile.objects.filter(
+            Q(name__icontains=query) |
+            Q(user__username__icontains=query)
+        )
+    
+

@@ -1,6 +1,9 @@
 from rest_framework import serializers
+from django.contrib.auth import get_user_model
 from .models import Post, Like, Comment, SavedPost
 from apps.accounts.models import Profile
+
+User = get_user_model()
 
 class UserListSerializer(serializers.ModelSerializer):
     username = serializers.CharField(
@@ -8,7 +11,7 @@ class UserListSerializer(serializers.ModelSerializer):
     )
     class Meta:
         model = Profile
-        fields = ('username', 'name', 'avatar')
+        fields = ('username', 'name', 'avatar', "biography")
 
 
 class PostSerializer(serializers.ModelSerializer):

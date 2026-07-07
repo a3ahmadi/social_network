@@ -16,6 +16,7 @@ class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = RegisterSerializer
 
+
 class ProfileView(RetrieveUpdateAPIView):
     permission_classes = [IsAuthenticated, IsOwner]
     queryset = Profile.objects.select_related("user")

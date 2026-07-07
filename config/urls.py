@@ -38,7 +38,9 @@ from apps.posts.views import (
     CommentDetailView,
     FeedView,
     SavePostView,
-    SavePostListView
+    SavePostListView,
+    UserSearchView,
+    PostSearchView
 
 )
 
@@ -63,6 +65,9 @@ urlpatterns = [
 #save post
     path('api/post/<int:post_id>/save/',SavePostView.as_view()),
     path('api/post/saved/',SavePostListView.as_view()),
+#search user
+    path('api/search/users/',UserSearchView.as_view()),
+    
 
 
 ]
