@@ -144,3 +144,13 @@ class UserSearchView(generics.ListAPIView):
         )
     
 
+class PostSearchView(generics.ListAPIView):
+    serializer_class = PostSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        query = self.request.query_params.get("q", "")
+        return Post.objects.filter(
+            Q(caption__icontains=query) |
+            Q(location__icontains=query)
+        )

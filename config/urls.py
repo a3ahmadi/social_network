@@ -67,7 +67,7 @@ urlpatterns = [
     path('api/post/saved/',SavePostListView.as_view()),
 #search user
     path('api/search/users/',UserSearchView.as_view()),
-    
+    path('api/search/posts/',PostSearchView.as_view()),
 
 
 ]
