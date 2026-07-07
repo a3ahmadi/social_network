@@ -3,16 +3,19 @@ from rest_framework.views import APIView
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from .models import Post, Comment
+from apps.follows.models import Follow
 from rest_framework import status
 from rest_framework.response import Response
 from .permissions import IsCommentOwner
+from django.db.models import Q
 from .serializers import (
     PostSerializer,
     LikeListSerializer,
     CommentListSerializer,
     CommentUpdateSerializer,
     CommentDetailSerializer,
-    CommentCreateSerializer
+    CommentCreateSerializer,
+    Feedserializer
 )
 from .services import(
     like_post,
@@ -79,5 +82,25 @@ class CommentDetailView(generics.RetrieveUpdateDestroyAPIView):
         return CommentDetailSerializer
 
 
+class FeedView(generics.ListAPIView):
+    serializer_class = PostSerializer
+    permission_classes = [IsAuthenticated]
 
+    def get_queryset(self):
+        following_ids = Follow.objects.filter(
+            follower=self.request.user
+        ).values_list(
+            "following_id",
+            flat=True
+        )
+
+        return Post.objects.filter(
+            Q(user=self.request.user) |
+            Q(user_id__in=following_ids)
+        ).select_related(
+            "user",
+            "user__profile"
+        ).order_by(
+            "-created_at"
+        )
 

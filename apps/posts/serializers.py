@@ -127,3 +127,9 @@ class CommentCreateSerializer(serializers.ModelSerializer):
             )
 
         return value
+    
+
+class Feedserializer(serializers.Serializer):
+    class Meta:
+        model = Post
+        fields = "__all__"
