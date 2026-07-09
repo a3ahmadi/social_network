@@ -43,6 +43,12 @@ from apps.posts.views import (
     PostSearchView
 
 )
+from apps.notifications.views import(
+    NotificationListView,
+    UnreadNotificationView,
+    ReadNotificationView,
+    ReadAllNotificationView
+)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -68,6 +74,11 @@ urlpatterns = [
 #search user
     path('api/search/users/',UserSearchView.as_view()),
     path('api/search/posts/',PostSearchView.as_view()),
+#notifications
+    path('api/notifications/',NotificationListView.as_view()),
+    path('api/notifications/unread-count/',UnreadNotificationView.as_view()),
+    path('api/notifications/<int:id>/read/',ReadNotificationView.as_view()),
+    path('api/notifications/read-all/',ReadAllNotificationView.as_view()),
 
 
 ]
