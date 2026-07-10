@@ -359,3 +359,5 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 >>>>>>> 75fecf20505d5b6e7d4c210bbff19ae313bd17c8
+
+media

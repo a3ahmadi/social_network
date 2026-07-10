@@ -22,33 +22,11 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 
-from apps.accounts.views import (
-    RegisterView,
-    ProfileView
-)
-from apps.follows.views import (
-    FollowView,
-    FollowerListView,
-    FollowingListView
-)
-from apps.posts.views import (
-    PostViewset,
-    LikeView,
-    CommentListCreateView,
-    CommentDetailView,
-    FeedView,
-    SavePostView,
-    SavePostListView,
-    UserSearchView,
-    PostSearchView
-
-)
-from apps.notifications.views import(
-    NotificationListView,
-    UnreadNotificationView,
-    ReadNotificationView,
-    ReadAllNotificationView
-)
+from apps.accounts.views import *
+from apps.follows.views import *
+from apps.posts.views import *
+from apps.notifications.views import *
+from apps.stories.views import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -79,7 +57,13 @@ urlpatterns = [
     path('api/notifications/unread-count/',UnreadNotificationView.as_view()),
     path('api/notifications/<int:id>/read/',ReadNotificationView.as_view()),
     path('api/notifications/read-all/',ReadAllNotificationView.as_view()),
-
+#stories
+    path('api/stories/',StoryCreateView.as_view()),
+    path('api/stories/<int:pk>/',StoryDeleteView.as_view()),
+    path('api/stories/user/<str:username>/',UserStoryListView.as_view()),
+    path('api/stories/feed/',StoryFeedView.as_view()),
+    path('api/stories/<int:story_id>/view/',StoryViewCreateView.as_view()),
+    path('api/stories/<int:story_id>/viewers/',StoryViewerListView.as_view()),
 
 ]
 
