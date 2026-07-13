@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'apps.follows',
     'apps.notifications',
     'apps.stories',
+    'apps.chat',
 ]
 
 MIDDLEWARE = [

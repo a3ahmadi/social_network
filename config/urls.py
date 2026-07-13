@@ -27,6 +27,7 @@ from apps.follows.views import *
 from apps.posts.views import *
 from apps.notifications.views import *
 from apps.stories.views import *
+from apps.chat.views import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -64,6 +65,17 @@ urlpatterns = [
     path('api/stories/feed/',StoryFeedView.as_view()),
     path('api/stories/<int:story_id>/view/',StoryViewCreateView.as_view()),
     path('api/stories/<int:story_id>/viewers/',StoryViewerListView.as_view()),
+#chat
+    path('api/conversations/',conversationsListView.as_view()),
+    path('api/conversations/create/',ConversationCreateView.as_view()),
+    path("api/conversations/<int:pk>/",ConversationDetailView.as_view()),
+    path("api/conversations/<int:id>/messages/",ConversationMessageListView.as_view()),
+    path("api/conversations/<int:id>/messages/",ConversationMessageListView.as_view()),
+    path("api/conversations/<int:id>/messages/create/",MessageCreateView.as_view()),
+    path("api/messages/<int:pk>/",MessageDestroyView.as_view()),
+    path("api/conversations/<int:id>/read/",ReadingMessagesView.as_view()),
+    path("api/messages/unread-count/",UnreadCountMessagesView.as_view()),
+    path("api/conversations/search/",SearchConversationView.as_view()),
 
 ]
 
