@@ -1,9 +1,8 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
-
 from .models import Conversation, Message
-
 import json
+from django.utils import timezone
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
@@ -26,6 +25,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
             await self.close()
             return
 
+        await self.set_online()
+
         self.room_group_name = (
             f"chat_{self.conversation_id}"
         )
@@ -38,6 +39,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.accept()
 
     async def disconnect(self, close_code):
+
+        await self.set_offline()
 
         await self.channel_layer.group_discard(
             self.room_group_name,
@@ -205,4 +208,30 @@ class ChatConsumer(AsyncWebsocketConsumer):
             sender=self.user
         ).update(
             is_read=True
+        )
+
+    @database_sync_to_async
+    def set_online(self):
+
+        profile = self.user.profile
+
+        profile.is_online = True
+
+        profile.save(
+            update_fields=["is_online"]
+        )
+
+    @database_sync_to_async
+    def set_offline(self):
+
+        profile = self.user.profile
+
+        profile.is_online = False
+        profile.last_seen = timezone.now()
+
+        profile.save(
+            update_fields=[
+                "is_online",
+                "last_seen"
+            ]
         )
