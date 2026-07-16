@@ -67,6 +67,29 @@ class ChatConsumer(AsyncWebsocketConsumer):
             )
 
             return
+        
+        if message_type == "typing":
+
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    "type": "user_typing",
+                    "username": self.user.username,
+                }
+            )
+            return
+        
+        if message_type == "stop_typing":
+
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    "type": "user_stop_typing",
+                    "username": self.user.username,
+                }
+            )
+
+            return
 
         text = data.get("text", "").strip()
 
@@ -118,6 +141,34 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 {
                     "type": "messages_read",
                     "reader": event["reader"],
+                }
+            )
+        )
+
+    async def user_typing(self, event):
+
+        if event["username"] == self.user.username:
+            return
+
+        await self.send(
+            text_data=json.dumps(
+                {
+                    "type": "typing",
+                    "user": event["username"],
+                }
+            )
+        )
+
+    async def user_stop_typing(self, event):
+
+        if event["username"] == self.user.username:
+            return
+
+        await self.send(
+            text_data=json.dumps(
+                {
+                    "type": "stop_typing",
+                    "user": event["username"],
                 }
             )
         )
