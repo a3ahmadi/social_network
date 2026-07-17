@@ -10,10 +10,11 @@ class ConversationListSerializer(serializers.ModelSerializer):
     )
     last_message = serializers.SerializerMethodField()
     last_message_sender = serializers.SerializerMethodField()
+    unread_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Conversation
-        fields = ("users", "is_group", "last_message", "last_message_sender")
+        fields = ("users", "is_group", "last_message", "last_message_sender", "unread_count")
 
     def get_last_message(self, obj):
         message = obj.messages.last()
@@ -30,6 +31,16 @@ class ConversationListSerializer(serializers.ModelSerializer):
             return message.sender.username
 
         return None
+    
+    def get_unread_count(self, obj):
+        request = self.context["request"]
+
+        return Message.objects.filter(
+            conversation__id=obj.id,
+            is_read=False
+        ).exclude(
+            sender=request.user
+        ).distinct().count()
     
 
 class ConversationDetailSerializer(serializers.ModelSerializer):
