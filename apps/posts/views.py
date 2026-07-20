@@ -10,6 +10,8 @@ from rest_framework import status
 from rest_framework.response import Response
 from .permissions import IsOwner
 from django.db.models import Q
+from apps.notifications.services import NotificationService
+from django.shortcuts import get_object_or_404
 from .serializers import (
     PostSerializer,
     LikeListSerializer,
@@ -47,6 +49,15 @@ class LikeView(APIView):
 
     def post(self, request, post_id):
         result = like_post(request.user, post_id)
+        
+        post = get_object_or_404(Post, id=post_id)
+
+        NotificationService.create_post_like_notification(
+            actor=request.user,
+            recipient=post.user,
+            post=post
+        )
+
         return Response({'status': result}, status=status.HTTP_201_CREATED)
     
     def delete(self, request, post_id):
@@ -65,10 +76,31 @@ class CommentListCreateView(generics.ListCreateAPIView):
     )
 
     def perform_create(self, serializer):
-        serializer.save(
+        comment = serializer.save(
             user=self.request.user,
             post_id=self.kwargs["post_id"]
         )
+
+        post = get_object_or_404(
+                Post,
+                id=self.kwargs["post_id"]
+            )
+
+        if comment.parent is None:
+
+            NotificationService.create_post_comment_notification(
+                recipient=post.user,
+                actor=self.request.user,
+                post=post,
+                comment=comment,
+            )
+
+        NotificationService.create_comment_reply_notification(
+                recipient=post.user,
+                actor=self.request.user,
+                post=post,
+                comment=comment,
+            )
 
     def get_serializer_class(self):
         if self.request.method == "POST":
