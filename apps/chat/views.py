@@ -135,6 +135,12 @@ class MessageDestroyView(generics.DestroyAPIView):
     permission_classes = [IsAuthenticated, IsOwner]
 
 
+class MessageUpdateView(generics.UpdateAPIView):
+    queryset = Message.objects.all()
+    permission_classes = [IsAuthenticated, IsOwner]
+    serializer_class = ConversationMessageSerializer
+
+
 class ReadingMessagesView(APIView):
     permission_classes = [IsAuthenticated]
 
