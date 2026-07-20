@@ -124,6 +124,32 @@ class ChatConsumer(AsyncWebsocketConsumer):
             }
         )
 
+        user_ids = await (
+            self.get_conversation_users()
+        )
+
+        for user_id in user_ids:
+
+            await self.channel_layer.group_send(
+                f"conversations_{user_id}",
+                {
+                    "type":
+                        "conversation_update",
+
+                    "conversation_id":
+                        self.conversation_id,
+
+                    "last_message":
+                        message.text,
+
+                    "sender":
+                        self.user.username,
+
+                    "created_at":
+                        message.created_at.isoformat(),
+                }
+            )
+
     async def chat_message(self, event):
 
         await self.send(
@@ -234,4 +260,18 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 "is_online",
                 "last_seen"
             ]
+        )
+
+    @database_sync_to_async
+    def get_conversation_users(self):
+
+        conversation = Conversation.objects.get(
+            id=self.conversation_id
+        )
+
+        return list(
+            conversation.users.values_list(
+                "id",
+                flat=True
+            )
         )
