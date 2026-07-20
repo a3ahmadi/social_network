@@ -95,12 +95,14 @@ class CommentListCreateView(generics.ListCreateAPIView):
                 comment=comment,
             )
 
-        NotificationService.create_comment_reply_notification(
-                recipient=post.user,
-                actor=self.request.user,
-                post=post,
-                comment=comment,
-            )
+        else:
+            
+            NotificationService.create_comment_reply_notification(
+                    recipient=post.user,
+                    actor=self.request.user,
+                    post=post,
+                    comment=comment,
+                )
 
     def get_serializer_class(self):
         if self.request.method == "POST":
