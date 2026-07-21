@@ -8,6 +8,7 @@ from .permissions import IsOwner
 from django.shortcuts import get_object_or_404
 from apps.chat.models import Conversation, Message
 from .serializers import *
+from core.pagination import LimitOffsetPaginations
 
 User = get_user_model()
 
@@ -15,6 +16,7 @@ User = get_user_model()
 class conversationsListView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = ConversationListSerializer
+    pagination_class = LimitOffsetPaginations
 
     def get_queryset(self):
         return Conversation.objects.filter(
@@ -83,6 +85,7 @@ class ConversationDetailView(generics.RetrieveAPIView):
 class ConversationMessageListView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = ConversationMessageSerializer
+    pagination_class = LimitOffsetPaginations
 
     def get_queryset(self):
         conversation = get_object_or_404(

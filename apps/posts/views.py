@@ -12,6 +12,7 @@ from .permissions import IsOwner
 from django.db.models import Q
 from apps.notifications.services import NotificationService
 from django.shortcuts import get_object_or_404
+from core.pagination import CursorPaginations, LimitOffsetPaginations
 from .serializers import (
     PostSerializer,
     LikeListSerializer,
@@ -36,6 +37,7 @@ class PostViewset(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     permission_classes = [IsAuthenticated]
     serializer_class = PostSerializer
+    pagination_class = LimitOffsetPaginations
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -43,9 +45,20 @@ class PostViewset(viewsets.ModelViewSet):
 
 class LikeView(APIView):
     def get(self, request, post_id):
-        result = post_likes_list(post_id)
-        serializer = LikeListSerializer(result, many=True)
-        return Response(serializer.data)
+        likes = post_likes_list(post_id)
+
+        paginator = LimitOffsetPaginations()
+        page = paginator.paginate_queryset(
+            likes,
+            request,
+            view=self
+        )
+
+        serializer = LikeListSerializer(page, many=True)
+
+        return paginator.get_paginated_response(
+            serializer.data
+        )
 
     def post(self, request, post_id):
         result = like_post(request.user, post_id)
@@ -68,6 +81,7 @@ class LikeView(APIView):
 class CommentListCreateView(generics.ListCreateAPIView):
     serializer_class = CommentListSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = LimitOffsetPaginations
 
     def get_queryset(self):
         return Comment.objects.filter(
@@ -125,6 +139,7 @@ class CommentDetailView(generics.RetrieveUpdateDestroyAPIView):
 class FeedView(generics.ListAPIView):
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = CursorPaginations
 
     def get_queryset(self):
         following_ids = Follow.objects.filter(
@@ -159,6 +174,7 @@ class SavePostView(APIView):
 class SavePostListView(generics.ListAPIView):
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = LimitOffsetPaginations
 
     def get_queryset(self):
         return Post.objects.filter(
@@ -169,6 +185,7 @@ class SavePostListView(generics.ListAPIView):
 class UserSearchView(generics.ListAPIView):
     serializer_class = UserListSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = LimitOffsetPaginations
 
     def get_queryset(self):
         query = self.request.query_params.get("q", "")
@@ -181,6 +198,7 @@ class UserSearchView(generics.ListAPIView):
 class PostSearchView(generics.ListAPIView):
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = LimitOffsetPaginations
 
     def get_queryset(self):
         query = self.request.query_params.get("q", "")

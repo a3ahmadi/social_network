@@ -10,6 +10,7 @@ from apps.posts.permissions import IsOwner
 from django.utils import timezone
 from django.db.models import Q
 from django.db.models import Prefetch
+from core.pagination import LimitOffsetPaginations
 
 User = get_user_model()
 
@@ -32,6 +33,7 @@ class StoryDeleteView(generics.DestroyAPIView):
 class UserStoryListView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = StorySerializer
+    pagination_class = LimitOffsetPaginations
 
     def get_queryset(self):
         return Story.objects.filter(
@@ -43,6 +45,7 @@ class UserStoryListView(generics.ListAPIView):
 class StoryFeedView(generics.ListAPIView):
     serializer_class = StoryFeedSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = LimitOffsetPaginations
 
     def get_queryset(self):
         following_ids = Follow.objects.filter(
@@ -83,6 +86,7 @@ class StoryViewCreateView(APIView):
 class StoryViewerListView(generics.ListAPIView):
     permission_classes = [IsAuthenticated, IsOwner]
     serializer_class = StoryUserSerializer
+    pagination_class = LimitOffsetPaginations
 
     def get_queryset(self):
         viewers_id = StoryView.objects.filter(

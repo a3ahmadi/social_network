@@ -14,6 +14,7 @@ from .models import Follow
 from .serializers import FollowerListSerializer, FollowingListSerializer
 from apps.notifications.services import NotificationService
 from django.contrib.auth import get_user_model
+from core.pagination import LimitOffsetPaginations
 
 User = get_user_model()
 
@@ -37,21 +38,46 @@ class FollowView(APIView):
 
 class FollowerListView(APIView):
     permission_classes = [IsAuthenticated]
+
     def get(self, request):
+        followers = get_followers(request.user)
+
+        paginator = LimitOffsetPaginations()
+        page = paginator.paginate_queryset(
+            followers,
+            request,
+            view=self
+        )
+
         serializer = FollowerListSerializer(
-            get_followers(request.user),
+            page,
             many=True
         )
-        return Response(serializer.data)
+
+        return paginator.get_paginated_response(
+            serializer.data
+        )
 
 
 class FollowingListView(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request):
+        following = get_followings(request.user)
+
+        paginator = LimitOffsetPaginations()
+        page = paginator.paginate_queryset(
+            following,
+            request,
+            view=self
+        )
+
         serializer = FollowingListSerializer(
-            get_followings(request.user),
+            page,
             many=True
         )
-        return Response(serializer.data)
+        
+        return paginator.get_paginated_response(
+            serializer.data
+        )
 
 

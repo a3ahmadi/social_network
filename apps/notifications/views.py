@@ -6,10 +6,12 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from apps.posts.permissions import IsOwner
 from rest_framework.permissions import IsAuthenticated
+from core.pagination import LimitOffsetPaginations
 
 class NotificationListView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = NotificationSerializer
+    pagination_class = LimitOffsetPaginations
 
     def get_queryset(self):
         return Notification.objects.filter(
