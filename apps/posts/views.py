@@ -13,6 +13,7 @@ from django.db.models import Q
 from apps.notifications.services import NotificationService
 from django.shortcuts import get_object_or_404
 from core.pagination import CursorPaginations, LimitOffsetPaginations
+from django.db.models import F
 from .serializers import (
     PostSerializer,
     LikeListSerializer,
@@ -41,6 +42,21 @@ class PostViewset(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+        Profile.objects.filter(
+            user=self.request.user
+        ).update(
+            posts_count=F('posts_count') + 1
+        )
+
+    def perform_destroy(self, instance):
+        Profile.objects.filter(
+            user=self.request.user
+        ).update(
+            posts_count=F('posts_count') - 1
+        )
+
+        instance.delete()
 
 
 class LikeView(APIView):
