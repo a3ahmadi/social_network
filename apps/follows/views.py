@@ -22,18 +22,21 @@ User = get_user_model()
 class FollowView(APIView):
     permission_classes = [IsAuthenticated]
     def post(self, request, username):
-        result = follow_user(request.user, username)
+        target_user = User.objects.get(username=username)
+        result = follow_user(request.user, target_user)
 
         NotificationService.create_follow_notification(
-            recipient=User.objects.get(username=username),
+            recipient=target_user,
             actor=request.user,
         )
 
         return Response({'status': result}, status=status.HTTP_201_CREATED)
     
     def delete(self, request, username):
-        result = unfollow_user(request.user, username)
-        return Response({'status': result}, status=status.HTTP_204_NO_CONTENT)
+        target_user = User.objects.get(username=username)
+        result = unfollow_user(request.user, target_user)
+        
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class FollowerListView(APIView):
