@@ -222,3 +222,25 @@ class PostSearchView(generics.ListAPIView):
             Q(caption__icontains=query) |
             Q(location__icontains=query)
         )
+
+
+class ExplorePostsListView(generics.ListAPIView):
+    serializer_class = PostSerializer
+    permission_classes = [IsAuthenticated]
+    pagination_class = LimitOffsetPaginations
+
+    def get_queryset(self):
+        follower_ids = Follow.objects.filter(
+            follower=self.request.user
+        ).values_list(
+            "following_id",
+            flat=True
+        )
+
+        return Post.objects.exclude(
+            user=self.request.user
+        ).exclude(
+            user_id__in=follower_ids
+        ).order_by(
+            "-created_at"
+        )

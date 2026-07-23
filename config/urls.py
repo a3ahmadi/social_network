@@ -77,7 +77,8 @@ urlpatterns = [
     path("api/conversations/<int:id>/read/",ReadingMessagesView.as_view()),
     path("api/messages/unread-count/",UnreadCountMessagesView.as_view()),
     path("api/conversations/search/",SearchConversationView.as_view()),
-
+#explore
+    path("api/explore/",ExplorePostsListView.as_view()),
 ]
 
 #posts
